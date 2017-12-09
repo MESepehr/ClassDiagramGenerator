@@ -1,5 +1,7 @@
 package
 {
+	import com.mteamapp.StringFunctions;
+	
 	import contents.TextFile;
 	
 	import flash.display.Sprite;
@@ -31,6 +33,7 @@ package
 			
 			this.addChild(txt);
 			
+			searchAndList(aspackFolder);
 			searchAndList(saffronFolder);
 			
 			var targetFile:File = File.desktopDirectory.resolvePath('SaffronExport.txt');
@@ -96,10 +99,42 @@ package
 			{
 				Tabs+='\t' ;
 			}
-			txt.appendText(Tabs+currentFile.name.substring(0,currentFile.name.length-3)+":\n");
+			txt.appendText(Tabs+currentFile.name.substring(0,currentFile.name.length-3)+"\n");
 			var loadedClass:String = TextFile.load(currentFile);
 			//trace("data is : "+loadedClass);
+			
+			if(loadedClass.indexOf('public class')==-1)
+			{
+				trace("This class is not public") ;
+				return ;
+			}
+			
+			var reg:RegExp = new RegExp('\/[*]{2}[^ژ]*?[*]\/[\n\r\t\s]*','gi');
+			var searchResult:Array = reg.exec(loadedClass);
+			if(searchResult!=null)
+			{
+				//searchResult = reg.exec(loadedClass);
+				for(i=0 ; i<searchResult.length ; i++)
+				{
+					showFunctionAndComment(searchResult[i],numberOftabs+1)
+				}
+			}
+			
 			System.pause();
 		}
+		
+		private function showFunctionAndComment(searched:String, numberOftabs:uint):void
+		{
+			var Tabs:String = '\t' ;
+			for(var i:int = 0 ; i<numberOftabs ; i++)
+			{
+				Tabs+='\t' ;
+			}
+			
+			//var publicFucntionString:String = "public function" ;
+			//var functionPart:String = searched.substr(searched.indexOf(publicFucntionString)+publicFucntionString.length);
+			txt.appendText(Tabs+'•'+searched.split('\n').join(' ').split('\r').join(' ').split('\/**').join('').split('*').join('').split('*\/').join('').split('/').join('').replace(/[\s\t]+/gi,' ')+'.\n');
+		}
+		
 	}
 }
